@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 24.2.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="&#x421;&#x43B;&#x43E;&#x439;_1"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 16 16"
+	 style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<circle style="fill:#0D5EAF;" cx="8" cy="8" r="8"/>
+<defs>
+	<filter id="Adobe_OpacityMaskFilter" filterUnits="userSpaceOnUse" x="-1" y="0" width="21" height="14">
+		<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+	</filter>
+</defs>
+<mask maskUnits="userSpaceOnUse" x="-1" y="0" width="21" height="14" id="mask0_1_">
+	<circle style="fill:#C4C4C4;filter:url(#Adobe_OpacityMaskFilter);" cx="8" cy="8" r="8"/>
+</mask>
+<g style="mask:url(#mask0_1_);">
+	<path style="fill:#FFFFFF;" d="M20,14H-1v-0.981h21V14z M20,10.689H-1V9.708h5.088V5.661H-1V4.68h5.088V0h0.95V4.68h3.088v0.981
+		H5.037v4.047H20V10.689z M20,7.378H8.006V6.397H20V7.378z M20,3.944H8.006V2.963H20V3.944z"/>
+</g>
+</svg>
