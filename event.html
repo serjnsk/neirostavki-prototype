@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Событие · Нейроставки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/app.css?v=6">
+<style>
+/* ============ страница события ============ */
+.ev-page{padding-block:18px 72px;max-width:1400px}
+.crumbs{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ink-3);margin-bottom:14px;flex-wrap:wrap}
+.crumbs a{color:var(--ink-2);text-decoration:none} .crumbs a:hover{color:var(--ink)}
+.block{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,.02)}
+.blk-h{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;margin-bottom:14px;flex-wrap:wrap}
+.blk-t{display:flex;align-items:baseline;gap:4px 12px;flex-wrap:wrap;min-width:0}
+.blk-h h3{margin:0;font-size:18px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
+.blk-h .sub{font-size:13px;color:var(--ink-2)}
+.blk-h .tools{display:flex;gap:10px;align-items:center;margin-left:auto}
+.sec-lbl{font-size:14px;font-weight:600;margin:0 0 4px}
+.price-chip{font-size:13px;color:var(--ink-2);background:var(--bg-2);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.price-chip b{color:var(--ink);font-weight:700}
+
+/* шапка матча */
+.ev-head{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 22px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.03),0 16px 40px -28px rgba(0,0,0,.25)}
+.eh-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.eh-meta{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2)}
+.eh-meta i{color:var(--ink-3);font-style:normal}
+.eh-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.upd{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);margin-right:6px;white-space:nowrap}
+.upd .dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex:none}
+.upd .info{margin-left:-2px}
+.eh-main{display:grid;grid-template-columns:1fr auto 1fr 320px;align-items:center;gap:22px;margin-top:18px}
+.eh-team{display:flex;align-items:center;gap:14px;min-width:0}
+.eh-team.right{flex-direction:row-reverse;text-align:right}
+.eh-team img,.eh-team .ini{width:76px;height:76px;border-radius:50%;border:1px solid var(--line);padding:8px;background:#fff;object-fit:contain;flex:none;font-size:18px}
+.eh-team b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;text-wrap:balance}
+.eh-team span{font-size:13px;color:var(--ink-2)}
+.eh-center{text-align:center;min-width:120px}
+.eh-time{font-size:36px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.eh-day{font-size:13px;color:var(--ink-2);margin-top:5px}
+.eh-count{font-size:12.5px;font-weight:600;color:var(--ink);margin-top:7px;display:inline-block;background:var(--bg-2);padding:2px 10px;border-radius:999px}
+.eh-tile{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.tile-pick{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.tile-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile-nums b{display:block;font-size:20px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile-nums span{font-size:12px;color:var(--ink-2);line-height:1.25;display:block;margin-top:2px}
+.tile-nums .info{margin-left:2px;width:16px;height:16px;vertical-align:-4px}
+.tile-val{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.tile-val .info{margin-left:-2px}
+
+/* исходы: мы против рынка */
+.eh-outs{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:10px;margin-top:18px}
+.oc{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.oc.pick{background:var(--accent-soft);border-color:#E2E48C}
+.oc-h{display:flex;align-items:baseline;gap:8px;min-width:0}
+.oc-h b{font-size:15px;font-weight:700}
+.oc-h span{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-h em{margin-left:auto;font-style:normal;font-size:12px;font-weight:600;background:var(--accent);padding:2px 9px;border-radius:999px;white-space:nowrap}
+.oc-row{display:grid;grid-template-columns:52px minmax(0,1fr) 56px;align-items:center;gap:10px;font-size:13px;color:var(--ink-2)}
+.oc-bar{height:8px;border-radius:4px;background:rgba(11,11,10,.07);overflow:hidden}
+.oc-bar i{display:block;height:100%;border-radius:4px}
+.oc-bar i.us{background:var(--ink)} .oc-bar i.mk{background:var(--mkt)}
+.oc-row b{font-size:15px;font-weight:700;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.oc-row b.m{font-weight:500;color:var(--ink-2)}
+.oc-diff{font-size:12.5px;font-weight:600;align-self:flex-start;padding:3px 8px;border-radius:6px;background:var(--bg-2);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.oc-diff.pos{background:var(--good-soft);color:var(--good)}
+
+/* сетка */
+.ev-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+.ev-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.ev-side{position:sticky;top:80px;display:flex;flex-direction:column;gap:16px}
+
+/* почему */
+.why-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px}
+.why-grid .wf li{font-size:13.5px}
+.watch li{display:grid;grid-template-columns:18px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.4;color:var(--ink)}
+.watch li:first-child{border-top:0}
+.watch li svg{width:16px;height:16px;color:var(--ink-2);margin-top:2px}
+
+/* линия: стандартные ставки против 7 БК */
+.tbl-wrap{overflow-x:auto;margin-inline:-20px;padding-inline:20px}
+.line{width:100%;border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums;font-size:14px;min-width:780px}
+.line th{font-weight:500;color:var(--ink-2);padding:6px;text-align:center;white-space:nowrap}
+.line thead tr.g th{font-size:12px;font-weight:600;color:var(--ink);padding:2px 6px 7px;border-bottom:1px solid var(--line-2)}
+.line thead tr.c th{font-size:13.5px;font-weight:700;color:var(--ink);padding:7px 6px 8px;border-bottom:1px solid var(--line)}
+.line thead tr.c th small{display:block;font:500 11.5px var(--mono);color:var(--ink-2);margin-top:1px}
+.line th.bk{text-align:left;vertical-align:bottom;font-size:12.5px;font-weight:500;color:var(--ink-2);border-bottom:1px solid var(--line);background:#fff}
+.line td{padding:6px;text-align:center;border-bottom:1px solid var(--line)}
+.line .gs{border-left:1px solid var(--line)}
+.line .bk{position:sticky;left:0;z-index:1}
+.line td.bk{text-align:left;white-space:nowrap;background:#fff;padding-right:12px}
+.line .bkc{display:inline-flex;align-items:center;gap:8px;font-weight:500}
+.line td.o b{display:block;font-size:14.5px;font-weight:600}
+.line td.o small{display:block;font:500 11.5px var(--mono);color:var(--ink-3);margin-top:1px}
+.line td.o small.pos{color:var(--good)}
+.line tr.bkr td.o{cursor:pointer;transition:box-shadow .12s}
+.line tr.bkr td.o:hover{box-shadow:inset 0 0 0 1px var(--ink-3)}
+.line td.best{background:var(--accent-soft)}
+.line tr.bkr td.picked,.line tr.bkr td.picked:hover{box-shadow:inset 0 0 0 2px var(--ink)}
+.line tr.sum td{background:var(--bg-3)}
+.line tr.ours td{background:var(--accent-soft)}
+.line tr.sum td.bk,.line tr.ours td.bk{font-weight:600}
+.line tr.sum td.o small,.line tr.ours td.o small{color:var(--ink-2)}
+.line td.act{text-align:right;width:1%;padding-left:10px}
+.go-btn{height:30px;padding:0 12px;border-radius:8px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;border:0;cursor:pointer;white-space:nowrap}
+.go-btn:hover{background:#2a2a28}
+.go-btn.lime{background:var(--accent);color:var(--ink)} .go-btn.lime:hover{background:var(--accent-hover)}
+
+/* график */
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .ax{font:400 11.5px var(--mono);fill:var(--ink-3)}
+.chart .lbl{font:600 12.5px var(--font);fill:var(--ink)} .chart .lbl.m{fill:var(--ink-2);font-weight:500}
+.chart-legend{display:flex;gap:16px;font-size:13px;color:var(--ink-2);margin-bottom:6px;flex-wrap:wrap}
+.chart-legend i{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:7px}
+.chart-legend .n{width:10px;height:10px;border-radius:50%;background:var(--accent);border:1.5px solid var(--ink)}
+.chart-tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12.5px;padding:7px 10px;border-radius:8px;transform:translate(-50%,calc(-100% - 10px));white-space:nowrap;display:none;z-index:5;line-height:1.4}
+.chart-tip b{color:var(--accent)}
+.chart-sum{font-size:14px;color:var(--ink);margin:10px 0 0;line-height:1.5}
+
+/* рынки */
+.mk{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;min-width:620px}
+.mk th{font-size:12.5px;font-weight:500;color:var(--ink-2);padding:6px 8px 8px;text-align:left;border-bottom:1px solid var(--line)}
+.mk td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.mk td.n{font-weight:500}
+.mk tr.mk-row{cursor:pointer} .mk tr.mk-row:hover td{background:var(--bg-3)}
+.mk tr.mk-row.open td{background:var(--bg-3);border-bottom:0}
+.mk .bkc{display:inline-flex;align-items:center;gap:8px;white-space:nowrap} .mk .bkc b{font-weight:600} .mk .bkn{color:var(--ink-2)}
+.mk .exp{width:28px;height:28px;border-radius:50%;border:1px solid var(--line-2);background:#fff;cursor:pointer;font-size:12px;transition:transform .2s}
+.mk tr.open .exp{transform:rotate(180deg)}
+.mk tr.mk-x td{background:var(--bg-3);padding:4px 8px 12px}
+.mk-list{display:flex;flex-wrap:wrap;gap:6px}
+.mk-bk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 8px;border-radius:8px;background:#fff;border:1px solid var(--line)}
+.mk-bk b{font-weight:600} .mk-bk i{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)} .mk-bk.best{border-color:var(--accent);background:var(--accent-soft)} .mk-bk.best i{color:var(--good)}
+
+/* форма и очные */
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.fm-h{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:6px;font-size:14px}
+.fm-h img,.fm-h .ini{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);padding:2px;object-fit:contain;font-size:9px}
+.fm li{display:grid;grid-template-columns:26px 1fr auto 56px;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:13.5px}
+.fm .opp i{font-style:normal;font-size:11px;color:var(--ink-3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;margin-right:6px}
+.fm .dt{font-size:12px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+.res{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
+.res.W{background:var(--good)} .res.D{background:var(--ink-3)} .res.L{background:var(--bad)}
+.h2h li{display:grid;grid-template-columns:110px 1fr auto 1fr 120px;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.h2h .dt,.h2h .cmp{font-size:12px;color:var(--ink-3)} .h2h .cmp{text-align:right} .h2h .t.r{text-align:right} .h2h b{font-variant-numeric:tabular-nums;background:var(--bg-2);padding:2px 8px;border-radius:6px}
+.h2h-sum{font-size:13.5px;color:var(--ink);margin:12px 0 0}
+.sub-h{font-size:14px;font-weight:600;margin:18px 0 6px}
+.abs-empty{font-size:13.5px;color:var(--ink-2);padding:8px 0}
+
+/* составы */
+.abs li{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.abs li span{font-size:12.5px;color:var(--ink-2);display:block;margin-top:1px}
+.st-chip{font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.st-chip.bad{background:var(--bad-soft);color:var(--bad)} .st-chip.warn{background:var(--warn-soft);color:var(--warn)} .st-chip.good{background:var(--good-soft);color:var(--good)} .st-chip.dark{background:var(--bg-2);color:var(--ink-2)}
+
+/* статистика */
+.st-head{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-bottom:4px}
+.st li{display:grid;grid-template-columns:56px 1fr 160px 1fr 56px;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;font-variant-numeric:tabular-nums}
+.st li:first-child{border-top:0}
+.st .lbl{text-align:center;font-size:12.5px;color:var(--ink-2);line-height:1.25}
+.st .tr{height:8px;display:flex} .st .tr.l{justify-content:flex-end}
+.st .tr i{display:block;height:100%;border-radius:3px} .st .tr.l i{background:var(--seg1)} .st .tr.r i{background:var(--mkt)}
+.st b{font-weight:500;color:var(--ink-2)} .st b.win{font-weight:700;color:var(--ink)} .st b.r{text-align:right}
+
+/* источники */
+.tl li{display:grid;grid-template-columns:110px 1fr auto;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px;align-items:start}
+.tl li:first-child{border-top:0}
+.tl .ts{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);padding-top:3px}
+.tl .srcx{font-size:12px;color:var(--ink-2);display:inline-block;padding:1px 7px;border-radius:5px;background:var(--bg-2);margin-bottom:3px}
+.tl p{margin:0;line-height:1.4}
+
+/* калькулятор */
+.calc .fld{margin-bottom:10px}
+.calc .in{display:grid;grid-template-columns:1fr 1.35fr;gap:8px}
+.calc label{font-size:12.5px;font-weight:500;color:var(--ink-2);display:block;margin-bottom:5px}
+.calc input,.calc select{width:100%;height:40px;border:1px solid var(--line-2);border-radius:8px;padding:0 10px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.calc .out{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.calc .out div{background:var(--bg-2);border-radius:10px;padding:10px 12px}
+.calc .out b{display:block;font-size:18px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.calc .out span{font-size:12px;color:var(--ink-2);line-height:1.25;display:block;margin-top:2px}
+.calc .out span .info{width:16px;height:16px;margin-left:3px;vertical-align:-4px}
+.calc .out div.ev{background:var(--accent-soft)} .calc .out div.ev.neg{background:var(--bad-soft)}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 3px rgba(239,240,42,0)}}
+.block.flash{animation:flash 1s ease-out}
+
+/* ещё валуи */
+.more-row{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);text-decoration:none;color:inherit;font-size:13px}
+.more-row:first-of-type{border-top:0}
+.more-row:hover b{text-decoration:underline}
+.more-row .t{font-variant-numeric:tabular-nums;line-height:1.2} .more-row .t b{display:block;font-weight:600} .more-row .t span{font-size:11.5px;color:var(--ink-3)}
+.more-row .nm b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px} .more-row .nm span{font-size:12px;color:var(--ink-3)}
+
+/* мобильная панель */
+.mcta{display:none;position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));align-items:center;gap:12px;justify-content:space-between}
+.mcta span{font-size:12px;color:var(--ink-2)}
+.mcta b{display:block;font-size:15px;font-weight:600}
+
+@media(max-width:1100px){
+  .ev-grid{grid-template-columns:1fr}
+  .ev-side{position:static}
+  .eh-main{grid-template-columns:1fr auto 1fr}
+  .eh-tile{grid-column:1/-1}
+  .mcta{display:flex}
+  .ev-page{padding-bottom:110px}
+}
+@media(max-width:760px){
+  .why-grid,.form2{grid-template-columns:1fr}
+  .eh-main{grid-template-columns:1fr;gap:14px}
+  .eh-team.right{flex-direction:row;text-align:left}
+  .eh-center{text-align:left;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .eh-team img,.eh-team .ini{width:56px;height:56px}
+  .eh-team b{font-size:21px}
+  .eh-outs{grid-template-columns:1fr}
+  .h2h li{grid-template-columns:1fr auto 1fr}
+  .h2h .dt,.h2h .cmp{display:none}
+  .st li{grid-template-columns:44px 1fr 104px 1fr 44px;font-size:12.5px}
+  .tl li{grid-template-columns:1fr auto}
+  .tl .ts{grid-column:1/-1;padding-top:0}
+  .block{padding:14px}
+  .tbl-wrap{margin-inline:-14px;padding-inline:14px}
+}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="page">
+<div id="site-header"></div>
+<main class="wrap ev-page">
+  <nav class="crumbs" id="crumbs" aria-label="Навигация"></nav>
+  <section class="ev-head" id="evHead"></section>
+  <div class="ev-grid">
+    <div class="ev-main">
+      <section class="block" id="blkWhy"></section>
+      <section class="block" id="blkOdds"></section>
+      <section class="block" id="blkChart"></section>
+      <section class="block" id="blkMarkets"></section>
+      <section class="block" id="blkForm"></section>
+      <section class="block" id="blkSquads"></section>
+      <section class="block" id="blkStats"></section>
+      <section class="block" id="blkSources"></section>
+    </div>
+    <aside class="ev-side">
+      <section class="block" id="blkCalc"></section>
+      <section class="block" id="blkMore"></section>
+    </aside>
+  </div>
+</main>
+<div id="site-footer"></div>
+</div>
+<div class="mcta" id="mcta"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="assets/logos.js?v=6"></script>
+<script src="assets/data.js?v=6"></script>
+<script src="assets/app.js?v=6"></script>
+<script>
+mountChrome('events');
+const qid = +(new URLSearchParams(location.search).get('id'));
+const ev = EVENTS.find(e => e.id === qid) || EVENTS[0];
+const a = analyze(ev), d = getDetail(ev), dt = parse(ev.dt);
+document.title = `${ev.t1.n} — ${ev.t2.n} · Нейроставки`;
+let onlyVal = false;
+const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>';
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const SRC_N = plural(a.src.length, ['источник', 'источника', 'источников']);
+const blkH = (title, sub, tip, tools) => `<div class="blk-h"><div class="blk-t"><h3>${title}${tip ? infoBtn(tip) : ''}</h3>${sub ? `<span class="sub">${sub}</span>` : ''}</div>${tools ? `<div class="tools">${tools}</div>` : ''}</div>`;
+const goBtn = (bk, lime, label) => `<button class="go-btn ${lime ? 'lime' : ''}" type="button" data-soon="Переход на сайт ${bk.name} — партнёрская ссылка (прототип)">${label || 'Перейти →'}</button>`;
+
+/* ---------- шапка: прогноз и сравнение исходов с рынком ---------- */
+function renderHead(){
+  const k = dayDiff(dt), bestP = a.best[a.pick];
+  const count = k === 0 ? 'сегодня' : k === 1 ? 'завтра' : k < 0 ? 'матч прошёл' : 'через ' + plural(k, ['день', 'дня', 'дней']);
+  $('#crumbs').innerHTML = `<a href="index.html">Главная</a><span aria-hidden="true">›</span><a href="index.html#events">События</a><span aria-hidden="true">›</span><a href="#" data-soon>${SPORTS[ev.sport].n}</a><span aria-hidden="true">›</span><span>${esc(ev.league)}</span>`;
+  const meta = [`<span>${esc(ev.league)} · ${esc(ev.sub)}</span>`, `<span>${esc(d.place || ev.venue)}</span>`];
+  if (d.referee) meta.push(`<span>Судья: ${esc(d.referee)}</span>`);
+  if (d.weather) meta.push(`<span>${esc(d.weather)}</span>`);
+  const day = k === 0 || k === 1 ? dayLabel(dt) + ', ' + fullDate(dt) : cap(fullDate(dt));
+  const mx = Math.max(...ev.p, ...a.mkt);
+  const outs = a.labels.map((l, i) => {
+    const diff = Math.round((ev.p[i] - a.mkt[i]) * 1000) / 10;
+    const word = diff >= 1 ? 'выше рынка' : diff <= -1 ? 'ниже рынка' : 'на уровне рынка';
+    return `<div class="oc ${i === a.pick ? 'pick' : ''}">
+      <div class="oc-h"><b>${l}</b><span>${esc(a.subs[i])}</span>${i === a.pick ? '<em>наш прогноз</em>' : ''}</div>
+      <div class="oc-row"><span>Мы</span><div class="oc-bar"><i class="us" style="width:${(ev.p[i] / mx * 100).toFixed(1)}%"></i></div><b>${fPct1(ev.p[i] * 100)}</b></div>
+      <div class="oc-row"><span>Рынок</span><div class="oc-bar"><i class="mk" style="width:${(a.mkt[i] / mx * 100).toFixed(1)}%"></i></div><b class="m">${fPct1(a.mkt[i] * 100)}</b></div>
+      <span class="oc-diff ${diff >= 1 ? 'pos' : ''}">${fPP(diff)} п.п. · ${word}</span>
+    </div>`;
+  }).join('');
+  $('#evHead').innerHTML = `
+    <div class="eh-top">
+      <div class="eh-meta">${sportChip(ev.sport)}${meta.join('<i aria-hidden="true">·</i>')}</div>
+      <div class="eh-actions">
+        <span class="upd"><span class="dot"></span>Обновлено ${UPDATED}${infoBtn(`Оценку пересчитываем при каждом изменении линии и при появлении новостей. В модели ${SRC_N} — список в блоке «Источники и хронология».`)}</span>
+        <button class="btn ghost sm" type="button" data-soon="Добавили в избранное: уведомим, если оценка или валуй изменятся (прототип)">☆ Следить</button>
+        <button class="btn ghost sm" type="button" data-soon="Ссылка скопирована (прототип)">Поделиться</button>
+      </div>
+    </div>
+    <div class="eh-main">
+      <div class="eh-team">${logo(ev.t1)}<div><b>${esc(ev.t1.n)}</b><span>${INDIVIDUAL[ev.sport] ? 'первый в линии' : 'хозяева'}</span></div></div>
+      <div class="eh-center"><div class="eh-time">${timeStr(dt)}</div><div class="eh-day">${day}</div><div class="eh-count">${count}</div></div>
+      <div class="eh-team right">${logo(ev.t2)}<div><b>${esc(ev.t2.n)}</b><span>${INDIVIDUAL[ev.sport] ? 'второй в линии' : 'гости'}</span></div></div>
+      <div class="eh-tile">
+        <div class="b-label">Наш прогноз</div>
+        <div class="tile-pick">${a.labels[a.pick]} · ${esc(pickName(ev, a))}</div>
+        <div class="tile-nums">
+          <div><b>${fPct(ev.p[a.pick])}</b><span>вероятность</span></div>
+          <div><b>${fO(a.fair[a.pick])}</b><span>наш кэф${infoBtn(TIP_FAIR)}</span></div>
+          <div><b>${fO(bestP.o)}</b><span>лучший · ${bestP.bk.name}</span></div>
+        </div>
+        <div class="tile-val"><span class="val-badge ${a.strength}">${valBadge(a, true)}</span><span>${STRENGTH_LABEL[a.strength]}</span>${infoBtn(TIP_VAL)}</div>
+      </div>
+    </div>
+    <div class="eh-outs" style="--n:${a.n}">${outs}</div>`;
+}
+
+/* ---------- почему ---------- */
+function renderWhy(){
+  const wf = `<ul class="wf">
+    <li class="base"><span>Рынок: консенсус 7 БК без маржи</span><span class="pp n">${fPct1(a.mktR)}</span></li>
+    ${a.factors.map(f => `<li><span>${esc(f.t)}</span><span class="pp ${f.pp >= 0 ? 'pos' : 'neg'}">${fPP(f.pp)}</span></li>`).join('')}
+    <li class="total"><span>Наша оценка · ${a.labels[a.pick]}</span><span class="pp n">${fPct1(a.pR)}</span></li></ul>`;
+  $('#blkWhy').innerHTML = blkH(`Почему ${fPct(ev.p[a.pick])} на ${a.labels[a.pick]} — ${esc(pickName(ev, a))}`, '',
+      'Начинаем с вероятности, которую закладывает рынок, и показываем, на сколько процентных пунктов каждый найденный фактор сдвинул нашу оценку. Сумма вкладов равна разнице между нашей оценкой и рынком.') +
+    `<div class="why-grid"><div><p class="sec-lbl">Разложение оценки</p>${wf}</div>
+     <div><p class="sec-lbl">Что может изменить оценку</p><ul class="watch">${d.watch.map(w => `<li>${EYE}<span>${esc(w)}</span></li>`).join('')}</ul></div></div>`;
+}
+
+/* ---------- линия: стандартные ставки против 7 БК (как в линии Фонбета) ---------- */
+const S = stdLine(ev);
+const calc = {col: S.cols.find(c => c.res === a.pick).id, bk: 0, stake: 1000};
+calc.bk = S.cols[calc.col].best.bi;
+function renderLine(){
+  const pickCol = S.cols.find(c => c.res === a.pick), off = offersFor(ev, a, a.pick);
+  const order = BK.map((b, i) => i).sort((x, y) => pickCol.odds[y] - pickCol.odds[x]);
+  const starts = new Set(S.groups.map(g => g.cols[0].id)), gs = c => starts.has(c.id) ? 'gs ' : '';
+  const head = `<thead><tr class="g"><th class="bk" rowspan="2">Букмекер</th>${S.groups.map(g => `<th class="gs" colspan="${g.cols.length}">${g.name}</th>`).join('')}<th rowspan="2"></th></tr>
+    <tr class="c">${S.cols.map(c => `<th class="${gs(c)}" title="${esc(c.name)}">${c.lbl}${c.line ? `<small>${c.line}</small>` : ''}</th>`).join('')}</tr></thead>`;
+  const rows = order.map((bi, ri) => `<tr class="bkr"><td class="bk"><span class="bkc">${bkLogo(BK[bi])}${BK[bi].name}</span></td>${S.cols.map(c => {
+      const o = c.odds[bi], v = c.p * o - 1;
+      return `<td class="o ${gs(c)}${c.best.bi === bi ? 'best ' : ''}${calc.col === c.id && calc.bk === bi ? 'picked' : ''}" data-c="${c.id}" data-b="${bi}" title="${esc(c.name)} · ${BK[bi].name}"><b>${fO(o)}</b><small class="${v >= .02 ? 'pos' : ''}">${fEV(v)}</small></td>`;
+    }).join('')}<td class="act">${goBtn(BK[bi], ri === 0, 'Перейти')}</td></tr>`).join('');
+  const sum = `<tr class="sum"><td class="bk">Рынок без маржи${infoBtn('Средний кэф семи букмекеров, очищенный от маржи. Под кэфом — вероятность, которую рынок закладывает в ставку.')}</td>${S.cols.map(c => `<td class="o ${gs(c)}"><b>${fO(1 / c.pm)}</b><small>${fPct1(c.pm * 100)}</small></td>`).join('')}<td></td></tr>`;
+  const ours = `<tr class="ours"><td class="bk">Наша оценка${infoBtn('Справедливый кэф = 1 / наша вероятность. Если букмекер даёт больше — у ставки положительный валуй.')}</td>${S.cols.map(c => `<td class="o ${gs(c)}"><b>${fO(c.fair)}</b><small>${fPct1(c.p * 100)}</small></td>`).join('')}<td></td></tr>`;
+  $('#blkOdds').innerHTML = blkH('Наша линия против 7 БК', `выбор БК меняет выигрыш на ${a.labels[a.pick]} до ${Math.round(off.cost * 100)}%`,
+      'Стандартные ставки, как в линии букмекера: исходы, двойные шансы, форы и тоталы. В ячейке — кэф и валуй при нашей вероятности, лаймом выделен лучший кэф в колонке. Нажмите на кэф, чтобы посчитать ставку в калькуляторе.') +
+    `<div class="tbl-wrap"><table class="line">${head}<tbody>${rows}${sum}${ours}</tbody></table></div>`;
+}
+function markPicked(){
+  document.querySelectorAll('.line td.picked').forEach(x => x.classList.remove('picked'));
+  const td = document.querySelector(`.line tr.bkr td.o[data-c="${calc.col}"][data-b="${calc.bk}"]`); if (td) td.classList.add('picked');
+}
+document.addEventListener('click', e => {
+  const td = e.target.closest('.line tr.bkr td.o'); if (!td) return;
+  calc.col = +td.dataset.c; calc.bk = +td.dataset.b; markPicked(); renderCalc(true);
+});
+
+/* ---------- график: мы против рынка ---------- */
+const CH = {W: 720, H: 250, pl: 44, pr: 108, pt: 18, pb: 30};
+function chartGeom(h){
+  const n = h.labels.length, all = h.mkt.concat(h.ours);
+  const lo = Math.floor(Math.min(...all) - 1), hi = Math.ceil(Math.max(...all) + 1);
+  const X = i => CH.pl + i * (CH.W - CH.pl - CH.pr) / (n - 1), Y = v => CH.pt + (hi - v) / (hi - lo) * (CH.H - CH.pt - CH.pb);
+  return {n, lo, hi, X, Y};
+}
+function chartSVG(h){
+  const {n, lo, hi, X, Y} = chartGeom(h), {W, H, pl, pr, pt, pb} = CH;
+  const step = (hi - lo) <= 8 ? 2 : (hi - lo) <= 16 ? 4 : 5, grid = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) grid.push(v);
+  const path = arr => arr.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
+  const area = path(h.ours) + ` L${X(n - 1).toFixed(1)} ${Y(lo).toFixed(1)} L${X(0).toFixed(1)} ${Y(lo).toFixed(1)} Z`;
+  let yO = Y(h.ours[n - 1]), yM = Y(h.mkt[n - 1]);
+  if (Math.abs(yO - yM) < 16){ const mid = (yO + yM) / 2, up = h.ours[n - 1] >= h.mkt[n - 1]; yO = mid + (up ? -9 : 9); yM = mid + (up ? 9 : -9); }
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Наша вероятность и рыночная по дням">
+    ${grid.map(v => `<g><line x1="${pl}" x2="${W - pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="#E6E3DD"/><text x="${pl - 8}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end" class="ax">${v}%</text></g>`).join('')}
+    ${h.labels.map((l, i) => (i % 2 === 0 || i === n - 1) ? `<text x="${X(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" class="ax">${l}</text>` : '').join('')}
+    <path d="${area}" fill="#EFF02A" opacity=".16"/>
+    <path d="${path(h.mkt)}" fill="none" stroke="#7C7A74" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${path(h.ours)}" fill="none" stroke="#0B0B0A" stroke-width="2.4" stroke-linejoin="round"/>
+    ${Object.keys(h.notes).map(i => `<circle cx="${X(+i).toFixed(1)}" cy="${Y(h.ours[+i]).toFixed(1)}" r="5.5" fill="#EFF02A" stroke="#0B0B0A" stroke-width="1.6"/>`).join('')}
+    <circle cx="${X(n - 1).toFixed(1)}" cy="${Y(h.ours[n - 1]).toFixed(1)}" r="4" fill="#0B0B0A"/><circle cx="${X(n - 1).toFixed(1)}" cy="${Y(h.mkt[n - 1]).toFixed(1)}" r="4" fill="#7C7A74"/>
+    <text x="${(X(n - 1) + 10).toFixed(1)}" y="${(yO + 4).toFixed(1)}" class="lbl">Мы ${fPct1(h.ours[n - 1])}</text>
+    <text x="${(X(n - 1) + 10).toFixed(1)}" y="${(yM + 4).toFixed(1)}" class="lbl m">Рынок ${fPct1(h.mkt[n - 1])}</text>
+    <line class="vline" x1="0" x2="0" y1="${pt}" y2="${H - pb}" stroke="#0B0B0A" stroke-dasharray="3 3" opacity="0"/>
+    <circle class="hp o" r="4.5" fill="#0B0B0A" opacity="0"/><circle class="hp m" r="4.5" fill="#7C7A74" opacity="0"/>
+    <rect class="hit" x="${pl}" y="${pt}" width="${W - pl - pr}" height="${H - pt - pb}" fill="transparent"/>
+  </svg>`;
+}
+function renderChart(){
+  const h = d.history, {n, X, Y} = chartGeom(h);
+  const m0 = h.mkt[0], m1 = h.mkt[n - 1], o0 = h.ours[0], o1 = h.ours[n - 1];
+  const sum = `За ${plural(n - 1, ['день', 'дня', 'дней'])} рынок ${m1 < m0 ? 'снизил' : m1 > m0 ? 'поднял' : 'не изменил'} оценку ${a.labels[a.pick]} с ${fPct1(m0)} до ${fPct1(m1)}, а мы ${o1 > o0 ? 'подняли' : o1 < o0 ? 'снизили' : 'держим'} с ${fPct1(o0)} до ${fPct1(o1)}. Расхождение ${fPP(o1 - m1)} п.п. — источник валуя.`;
+  $('#blkChart').innerHTML = blkH(`Как менялась оценка · ${a.labels[a.pick]}`, '',
+      'Вероятность исхода по дням с момента открытия линии. Лаймовые точки — моменты, когда появилась новая информация. Наведите на график, чтобы увидеть значения по дням.') +
+    `<div class="chart-legend"><span><i style="background:#0B0B0A"></i>Наша модель</span><span><i style="background:#7C7A74"></i>Рынок без маржи</span><span><i class="n"></i>Новая информация</span></div>
+     <div class="chart">${chartSVG(h)}<div class="chart-tip"></div></div><p class="chart-sum">${sum}</p>`;
+  const box = $('#blkChart .chart'), svg = box.querySelector('svg'), tip = box.querySelector('.chart-tip');
+  const vline = svg.querySelector('.vline'), hpO = svg.querySelector('.hp.o'), hpM = svg.querySelector('.hp.m'), hit = svg.querySelector('.hit');
+  hit.addEventListener('mousemove', e => {
+    const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * CH.W;
+    const i = Math.max(0, Math.min(n - 1, Math.round((x - CH.pl) / ((CH.W - CH.pl - CH.pr) / (n - 1)))));
+    vline.setAttribute('x1', X(i)); vline.setAttribute('x2', X(i)); vline.setAttribute('opacity', '.35');
+    hpO.setAttribute('cx', X(i)); hpO.setAttribute('cy', Y(h.ours[i])); hpO.setAttribute('opacity', '1');
+    hpM.setAttribute('cx', X(i)); hpM.setAttribute('cy', Y(h.mkt[i])); hpM.setAttribute('opacity', '1');
+    tip.innerHTML = `${h.labels[i].length <= 2 ? h.labels[i] + ' сен' : h.labels[i]}: мы <b>${fPct1(h.ours[i])}</b> · рынок ${fPct1(h.mkt[i])}${h.notes[i] ? '<br>' + esc(h.notes[i]) : ''}`;
+    tip.style.display = 'block'; tip.style.left = (X(i) / CH.W * r.width) + 'px'; tip.style.top = (Y(Math.max(h.ours[i], h.mkt[i])) / CH.H * r.height) + 'px';
+  });
+  hit.addEventListener('mouseleave', () => { vline.setAttribute('opacity', '0'); hpO.setAttribute('opacity', '0'); hpM.setAttribute('opacity', '0'); tip.style.display = 'none'; });
+}
+
+/* ---------- другие рынки ---------- */
+function renderMarkets(){
+  const list = d.markets, withVal = list.filter(m => m.val >= .02).length;
+  $('#blkMarkets').innerHTML = blkH('Дополнительные рынки', `${plural(withVal, ['рынок', 'рынка', 'рынков'])} с валуем из ${list.length}`,
+      'Спецрынки матча считаем той же моделью, что и основную линию. Нажмите на строку, чтобы увидеть цены всех семи букмекеров.',
+      `<label class="toggle"><input type="checkbox" id="onlyVal" ${onlyVal ? 'checked' : ''}><span class="sw"></span>Только с валуем</label>`) + `
+  <div class="tbl-wrap"><table class="mk"><thead><tr><th>Рынок</th><th>Наша вероятность</th><th>Наш кэф</th><th>Лучший кэф</th><th>Валуй</th><th></th></tr></thead><tbody>
+  ${list.map((m, i) => { const hide = onlyVal && m.val < .02; return `<tr class="mk-row" data-mk="${i}" ${hide ? 'hidden' : ''}><td class="n">${esc(m.n)}</td><td>${fPct(m.p)}</td><td>${fO(m.fair)}</td><td><span class="bkc">${bkLogo(m.best.bk)}<b>${fO(m.best.o)}</b><span class="bkn">${m.best.bk.name}</span></span></td><td><span class="val-badge ${m.strength}">${m.val >= .02 ? fEV(m.val) : 'нет валуя'}</span></td><td style="text-align:right"><button class="exp" type="button" aria-label="Показать цены всех БК">▾</button></td></tr>
+  <tr class="mk-x" hidden><td colspan="6"><div class="mk-list">${m.list.map((o, j) => `<span class="mk-bk ${j === 0 ? 'best' : ''}">${bkLogo(o.bk)}${o.bk.name} <b>${fO(o.o)}</b> <i>${fEV(m.p * o.o - 1)}</i></span>`).join('')}</div></td></tr>`; }).join('')}
+  </tbody></table></div>`;
+  $('#onlyVal').addEventListener('change', e => { onlyVal = e.target.checked; renderMarkets(); });
+}
+document.addEventListener('click', e => {
+  const row = e.target.closest('tr.mk-row'); if (!row || e.target.closest('a, .info, button:not(.exp)')) return;
+  const x = row.nextElementSibling; row.classList.toggle('open'); x.hidden = !x.hidden;
+});
+
+/* ---------- форма и очные ---------- */
+function teamGoals(m){ const [h, aw] = m.s.split(':').map(Number); return m.home === ev.t1.s ? [h, aw] : [aw, h]; }
+function renderForm(){
+  const fmList = (list, team) => `<div class="fm"><div class="fm-h">${logo(team)}<span>${esc(team.n)}</span></div><ul>${list.map(m => `<li><span class="res ${m.r}" aria-label="${m.r === 'W' ? 'победа' : m.r === 'D' ? 'ничья' : 'поражение'}">${m.r === 'W' ? 'В' : m.r === 'D' ? 'Н' : 'П'}</span><span class="opp">${m.h === null ? '' : (m.h ? '<i>дома</i>' : '<i>в гостях</i>')}${esc(m.opp)}</span><b>${esc(m.s)}</b><span class="dt">${m.d}</span></li>`).join('')}</ul></div>`;
+  let h2h;
+  if (ev.sport === 'mma' && !ev.detail) h2h = `<p class="sub-h">Очные бои</p><div class="abs-empty">Бойцы раньше не встречались</div>`;
+  else {
+    let w1 = 0, w2 = 0, dr = 0;
+    d.h2h.forEach(m => { const g = teamGoals(m); if (isNaN(g[0])) return; if (g[0] > g[1]) w1++; else if (g[0] < g[1]) w2++; else dr++; });
+    h2h = `<p class="sub-h">Очные встречи</p><ul class="h2h">${d.h2h.map(m => `<li><span class="dt">${m.d}</span><span class="t r">${esc(m.home)}</span><b>${esc(m.s)}</b><span class="t">${esc(m.away)}</span><span class="cmp">${esc(m.comp)}</span></li>`).join('')}</ul>
+      <p class="h2h-sum">Баланс последних встреч: ${plural(w1, ['победа', 'победы', 'побед'])} ${esc(ev.t1.s)}${a.n === 3 ? ', ' + plural(dr, ['ничья', 'ничьи', 'ничьих']) : ''}, ${plural(w2, ['победа', 'победы', 'побед'])} ${esc(ev.t2.s)}.</p>`;
+  }
+  $('#blkForm').innerHTML = blkH('Форма и очные встречи', 'последние 5 матчей') + `<div class="form2">${fmList(d.form.t1, ev.t1)}${fmList(d.form.t2, ev.t2)}</div>${h2h}`;
+}
+
+/* ---------- составы и потери ---------- */
+function renderSquads(){
+  const cls = {'травма': 'bad', 'под вопросом': 'warn', 'дисквалификация': 'dark', 'вернулся': 'good', 'готов': 'good'};
+  const list = (items, team) => `<div><div class="fm-h">${logo(team)}<span>${esc(team.n)}</span></div>${items.length ? `<ul class="abs">${items.map(x => `<li><div>${esc(x.n)}<span>${esc(x.why)}</span></div><span class="st-chip ${cls[x.st] || 'dark'}">${esc(x.st)}</span></li>`).join('')}</ul>` : '<div class="abs-empty">Потерь нет по данным источников</div>'}</div>`;
+  const tip = INDIVIDUAL[ev.sport]
+    ? 'Данные пресс-служб и медиа-дня. Официальное взвешивание учитываем автоматически.'
+    : 'Данные пресс-служб и проверенных инсайдеров. Стартовые составы появятся за 60 минут до начала — оценка будет пересчитана.';
+  $('#blkSquads').innerHTML = blkH(INDIVIDUAL[ev.sport] ? 'Состояние участников' : 'Составы и потери', '', tip) + `<div class="form2">${list(d.absences.t1, ev.t1)}${list(d.absences.t2, ev.t2)}</div>`;
+}
+
+/* ---------- статистика ---------- */
+function renderStats(){
+  $('#blkStats').innerHTML = blkH('Статистика сезона', '', 'Средние показатели за сезон. Жирным выделено значение той стороны, которая лучше по показателю.') + `
+  <div class="st-head"><span>${esc(ev.t1.s)}</span><span>${esc(ev.t2.s)}</span></div>
+  <ul class="st">${d.stats.map(s => { const mx = Math.max(s.a, s.b) || 1, aBetter = s.low ? s.a < s.b : s.a > s.b, bBetter = s.low ? s.b < s.a : s.b > s.a; return `<li><b class="${aBetter ? 'win' : ''}">${fNum(s.a, s.f)}</b><div class="tr l"><i style="width:${(s.a / mx * 100).toFixed(0)}%"></i></div><span class="lbl">${esc(s.n)}</span><div class="tr r"><i style="width:${(s.b / mx * 100).toFixed(0)}%"></i></div><b class="r ${bBetter ? 'win' : ''}">${fNum(s.b, s.f)}</b></li>`; }).join('')}</ul>`;
+}
+
+/* ---------- источники ---------- */
+function renderSources(){
+  $('#blkSources').innerHTML = blkH('Источники и хронология', SRC_N + ' в модели', 'Что и когда повлияло на оценку: время публикации, источник и вклад в процентных пунктах.') + `
+  <ul class="tl">${d.timeline.map(t => `<li><span class="ts">${esc(t.ts)}</span><div><span class="srcx">${esc(t.src)}</span><p>${esc(t.text)}</p></div><span class="pp ${t.dp >= 0 ? 'pos' : 'neg'}">${fPP(t.dp)}</span></li>`).join('')}</ul>
+  <div class="src" style="margin-top:12px">${a.src.map(s => `<span>${esc(s)}</span>`).join('')}</div>`;
+}
+
+/* ---------- калькулятор: любая стандартная ставка, любой БК ---------- */
+function calcOut(){
+  const c = S.cols[calc.col], o = c.odds[calc.bk];
+  const win = calc.stake * o, net = win - calc.stake, evr = c.p * win - calc.stake;
+  return `<div><b>${fRub(win)}</b><span>выплата при выигрыше</span></div>
+    <div><b>${fRub(net)}</b><span>чистый выигрыш</span></div>
+    <div><b>${fPct(c.p)}</b><span>шанс по нашей оценке</span></div>
+    <div class="ev ${evr >= 0 ? '' : 'neg'}"><b>${evr > 0 ? '+' : ''}${fRub(evr)}</b><span>матожидание${infoBtn('Матожидание = вероятность × выплата − ставка. Плюс означает выгоду на дистанции, а не гарантию выигрыша.')}</span></div>`;
+}
+function renderCalc(flash){
+  const c = S.cols[calc.col], order = BK.map((b, i) => i).sort((x, y) => c.odds[y] - c.odds[x]);
+  $('#blkCalc').innerHTML = blkH('Калькулятор', '', 'Выберите ставку и букмекера — или нажмите на любой кэф в таблице линии.', `<span class="price-chip">наша цена <b>${fO(c.fair)}</b></span>`) + `
+    <div class="calc">
+      <div class="fld"><label for="calcMk">Ставка</label><select id="calcMk">${S.groups.map(g => `<optgroup label="${esc(g.name)}">${g.cols.map(x => `<option value="${x.id}" ${x.id === calc.col ? 'selected' : ''}>${esc(x.name)} · валуй ${fEV(x.val)}</option>`).join('')}</optgroup>`).join('')}</select></div>
+      <div class="in">
+        <div><label for="stake">Сумма, ₽</label><input id="stake" type="number" min="100" step="100" value="${calc.stake}"></div>
+        <div><label for="calcBk">Букмекер</label><select id="calcBk">${order.map(i => `<option value="${i}" ${i === calc.bk ? 'selected' : ''}>${BK[i].name} · ${fO(c.odds[i])}${i === c.best.bi ? ' · лучший' : ''}</option>`).join('')}</select></div>
+      </div>
+      <div class="out" id="calcOut">${calcOut()}</div>
+    </div>`;
+  $('#calcMk').addEventListener('change', e => { calc.col = +e.target.value; calc.bk = S.cols[calc.col].best.bi; renderCalc(); markPicked(); });
+  $('#stake').addEventListener('input', e => { calc.stake = Math.max(0, +e.target.value || 0); $('#calcOut').innerHTML = calcOut(); });
+  $('#calcBk').addEventListener('change', e => { calc.bk = +e.target.value; $('#calcOut').innerHTML = calcOut(); markPicked(); });
+  if (flash){
+    const b = $('#blkCalc'); b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
+    const r = b.getBoundingClientRect(); if (r.top > innerHeight - 140 || r.bottom < 90) b.scrollIntoView({behavior: 'smooth', block: 'center'});
+  }
+}
+
+/* ---------- ещё валуи ---------- */
+function renderMore(){
+  const list = EVENTS.filter(e => e.id !== ev.id && topVal(e) >= VAL_TOP).sort((x, y) => topVal(y) - topVal(x)).slice(0, 4);
+  $('#blkMore').innerHTML = blkH('Ещё валуи', '', '', '<a class="link" href="index.html#events">Все события →</a>') +
+    list.map(e => { const x = analyze(e), t = parse(e.dt), dl = dayLabel(t); return `<a class="more-row" href="${evUrl(e)}"><div class="t"><b>${timeStr(t)}</b><span>${dl === 'Сегодня' || dl === 'Завтра' ? dl.toLowerCase() : shortDate(t)}</span></div><div class="nm"><b>${esc(e.t1.s)} — ${esc(e.t2.s)}</b><span>${esc(e.league)}</span></div><span class="val-badge ${x.strength}">${x.labels[x.pick]} ${fEV(x.val[x.pick])}</span></a>`; }).join('');
+}
+function renderMobileCta(){
+  const b = a.best[a.pick];
+  $('#mcta').innerHTML = `<div><span>Лучший кэф на ${a.labels[a.pick]} · валуй ${fEV(a.val[a.pick])}</span><b>${fO(b.o)} · ${b.bk.name}</b></div>${goBtn(b, true, 'Перейти')}`;
+}
+
+renderHead(); renderWhy(); renderLine(); renderChart(); renderMarkets(); renderForm(); renderSquads(); renderStats(); renderSources(); renderCalc(); renderMore(); renderMobileCta();
+if (qid && qid !== ev.id) toast('Событие не найдено — показываем ближайшее');
+initBackground();
+</script>
+</body>
+</html>
